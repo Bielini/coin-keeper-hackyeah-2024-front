@@ -1,21 +1,31 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, FlatList, TouchableOpacity } from 'react-native';
 
+// Define an interface for the Expense object
 interface Expense {
   name: string;
   amount: number;
 }
 
 const UserAccount: React.FC = () => {
-  // State to store the account balance
+  // State to store the account balance (number)
   const [accountBalance, setAccountBalance] = useState<number>(1000); // Initial account balance
-  const [expenseName, setExpenseName] = useState<string>(''); // State to store the entered expense name
-  const [expenseAmount, setExpenseAmount] = useState<string>(''); // State to store the entered expense amount
-  const [expenses, setExpenses] = useState<Expense[]>([]); // State to store the list of expenses
+
+  // State to store the entered expense name (string)
+  const [expenseName, setExpenseName] = useState<string>(''); 
+
+  // State to store the entered expense amount (string, to be converted to number)
+  const [expenseAmount, setExpenseAmount] = useState<string>(''); 
+
+  // State to store the entered amount to add to the balance (string, to be converted to number)
+  const [addFundsAmount, setAddFundsAmount] = useState<string>(''); 
+
+  // State to store the list of expenses (array of Expense objects)
+  const [expenses, setExpenses] = useState<Expense[]>([]); 
 
   // Function to handle the expense submission
-  const handleExpenseSubmit = () => {
-    const expenseValue = parseFloat(expenseAmount); // Convert the input to a number
+  const handleExpenseSubmit = (): void => {
+    const expenseValue: number = parseFloat(expenseAmount); // Convert string to number
 
     // Check if the entered expense is a valid number and greater than zero
     if (!expenseName || isNaN(expenseValue) || expenseValue <= 0) {
@@ -41,18 +51,40 @@ const UserAccount: React.FC = () => {
     setExpenseAmount('');
   };
 
+  // Function to handle adding more funds to the account balance
+  const handleAddFunds = (): void => {
+    const fundsValue: number = parseFloat(addFundsAmount); // Convert string to number
+
+    // Check if the entered amount is valid and greater than zero
+    if (isNaN(fundsValue) || fundsValue <= 0) {
+      Alert.alert('Error', 'Please enter a valid amount to add!');
+      return;
+    }
+
+    // Add funds to the account balance
+    setAccountBalance((prevBalance) => prevBalance + fundsValue);
+
+    // Clear the input field after submission
+    setAddFundsAmount('');
+  };
+
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>User Account Balance</Text>
-
-      {/* Display the current account balance */}
-      <Text style={styles.balance}>Update your balance</Text>
-      <TextInput
+       {/* Display the current account balance */}
+       <Text style={styles.balance}>Account Balance: {accountBalance} zł</Text>
+    {/* Input field for adding more funds */}
+    <TextInput
         style={styles.input}
-        placeholder="Enter expense name"
-        value={expenseName}
-        onChangeText={(text) => setExpenseName(text)} // Update state on text input
+        placeholder="Enter amount to add to balance"
+        keyboardType="numeric"
+        value={addFundsAmount}
+        onChangeText={(text) => setAddFundsAmount(text)} // Update state on text input
       />
+
+      {/* Button to add funds */}
+      <Button title="Add Funds" onPress={handleAddFunds} />
 
       {/* Input field for entering the expense name */}
       <TextInput
