@@ -28,7 +28,16 @@
             padding: 20px; /* Dodanie wypełnienia */
         }
 
-        .left-panel, .right-panel {
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Wyśrodkowanie zawartości */
+            justify-content: center; /* Wyśrodkowanie w pionie */
+            padding: 20px;
+            flex-grow: 1; /* Sprawia, że panel zajmuje dostępną przestrzeń */
+        }
+
+        .right-panel {
             text-align: center;
             padding: 20px;
         }
@@ -39,7 +48,9 @@
 
         .balance {
             font-size: 2em;
-            margin-bottom: 20px;
+            margin: 20px 0; /* Dodanie odstępu pionowego */
+            width: 100%; /* Rozciągnięcie na całą szerokość */
+            text-align: center; /* Wyśrodkowanie tekstu */
         }
 
         form {
@@ -48,6 +59,7 @@
             align-items: center; /* Wyśrodkowanie formularzy */
             justify-content: center; /* Wyśrodkowanie formularzy */
             width: 100%; /* Ustawienie szerokości formularza */
+            max-width: 400px; /* Ograniczenie szerokości formularza */
         }
 
         input {
@@ -153,14 +165,14 @@
         <div class="right-panel">
             <div class="monster">
                 <h1>Przeciwnik</h1>
-                <img src="https://via.placeholder.com/150" alt="Potwór" id="monster-image">
+                <img src="przeciwnik.png" alt="Potwór" id="monster-image"> <!-- Zmieniono źródło obrazka -->
                 <div class="life" id="monster-life">Życie: 100</div>
             </div>
         </div>
 
         <!-- Lewa strona: Moc i wydatki -->
         <div class="left-panel">
-            <h1>Coin Keeper</h1> <!-- Zmieniono tytuł na "Coin Keeper" -->
+            <h1 id="title">Coin Keeper</h1> <!-- Zmieniono tytuł na "Coin Keeper" -->
 
             <!-- Formularz ustawienia początkowej mocy i życia przeciwnika -->
             <form id="initial-balance-form">
@@ -200,7 +212,8 @@
         const monsterLifeElement = document.getElementById('monster-life');
         const monsterSection = document.querySelector('.monster'); // Dodano odniesienie do sekcji przeciwnika
         const gameOverScreen = document.getElementById('game-over-screen');
-        const restartButton = document.getElementById('restart-button');
+        const restartButton = document.getElementById('restart-button'); 
+        const titleElement = document.getElementById('title'); // Element tytułu
 
         // Funkcja aktualizująca Moc
         function updateBalance(amount) {
@@ -217,12 +230,11 @@
         initialBalanceForm.addEventListener('submit', function(event) {
             event.preventDefault();
             const initialBalance = parseFloat(document.getElementById('initial-balance').value);
-            const initialMonsterLife = parseFloat(document.getElementById('initial-monster-life').value);
+            monsterLife = parseFloat(document.getElementById('initial-monster-life').value);
 
+            // Ustawienie początkowych wartości
             balance = initialBalance;
-            monsterLife = initialMonsterLife;
-
-            balanceElement.textContent = `${balance}zł`;
+            balanceElement.textContent = `${balance}zł`; // Ustawienie początkowej wartości Mocy
             monsterLifeElement.textContent = `Życie: ${monsterLife}`;
 
             // Pokazanie sekcji zarządzania Mocą po ustawieniu początkowej wartości
@@ -231,7 +243,10 @@
             // Pokazanie sekcji przeciwnika po ustawieniu początkowej wartości
             monsterSection.style.display = 'block';
 
-            // Ukrycie formularza ustawienia początkowej Mocy
+            // Zmiana tytułu na "Moc"
+            titleElement.textContent = "Moc"; 
+
+            // Ukrycie formularza początkowego
             initialBalanceForm.style.display = 'none';
         });
 
@@ -273,6 +288,7 @@
             expenseSection.style.display = 'none';
             monsterSection.style.display = 'none'; // Ukrycie sekcji przeciwnika
             gameOverScreen.style.display = 'none'; // Ukrycie ekranu przegranej
+            titleElement.textContent = "Coin Keeper"; // Resetowanie tytułu
         }
     </script>
 
