@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Platform, Button, ScrollView, View } from 'react-native';
+import { Image, StyleSheet, Platform, Button, ScrollView, View, Text } from 'react-native';
 
 import { HelloWave } from '@/components/HelloWave';
 import { ThemedText } from '@/components/ThemedText';
@@ -7,11 +7,21 @@ import { useSession } from '../../ctx';
 import UserAccount from '@/components/UserAccount';
 import AnimalWave from '@/components/AnimalWave';
 
+
 export default function HomeScreen() {
   const { signOut } = useSession();
 
   return (
     <ScrollView style={{flex:1, paddingTop:40 , backgroundColor:'white'}}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text
+          onPress={() => {
+            // The `app/(app)/_layout.tsx` will redirect to the sign-in screen.
+            signOut();
+          }}>
+          Sign Out
+        </Text>
+      </View>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">User</ThemedText>
       </ThemedView>

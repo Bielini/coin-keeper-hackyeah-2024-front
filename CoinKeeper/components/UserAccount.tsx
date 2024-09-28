@@ -46,7 +46,13 @@ const UserAccount: React.FC = () => {
       <Text style={styles.title}>User Account Balance</Text>
 
       {/* Display the current account balance */}
-      <Text style={styles.balance}>Account Balance: {accountBalance} zł</Text>
+      <Text style={styles.balance}>Update your balance</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter expense name"
+        value={expenseName}
+        onChangeText={(text) => setExpenseName(text)} // Update state on text input
+      />
 
       {/* Input field for entering the expense name */}
       <TextInput
@@ -71,6 +77,7 @@ const UserAccount: React.FC = () => {
       </TouchableOpacity>
       {/* List of expenses */}
       <FlatList
+      horizontal
         data={expenses}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
