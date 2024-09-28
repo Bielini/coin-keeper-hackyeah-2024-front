@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gra z Mocą i Przeciwnikiem</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .left-panel, .right-panel {
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .balance {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 1em;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .expense-list {
+            margin-top: 20px;
+            max-width: 300px;
+        }
+
+        .expense-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px;
+            background-color: #f9f9f9;
+            margin-bottom: 5px;
+            border: 1px solid #ddd;
+        }
+
+        #expense-section {
+            display: none; /* Ukrywamy sekcję zarządzania Mocą na początku */
+        }
+
+        /* Styl dla przeciwnika */
+        .monster {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .monster img {
+            max-width: 150px;
+            height: auto;
+        }
+
+        .monster .life {
+            font-size: 1.5em;
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Lewa strona: Moc i wydatki -->
+        <div class="left-panel">
+            <h1>Moc</h1>
+
+            <!-- Formularz ustawienia początkowej mocy -->
+            <form id="initial-balance-form">
+                <input type="number" id="initial-balance" placeholder="Ustaw początkową Moc" required>
+                <button type="submit">Ustaw Moc</button>
+            </form>
+
+            <!-- Sekcja zarządzania wydatkami -->
+            <div id="expense-section">
+                <div class="balance">0zł</div>
+                <form id="expense-form">
+                    <input type="number" id="expense-amount" placeholder="Wartość wydatku" required>
+                    <input type="text" id="expense-description" placeholder="Opis wydatku" required>
+                    <button type="submit">Dodaj wydatek</button>
+                </form>
+                <div class="expense-list"></div>
+            </div>
+        </div>
+
+        <!-- Prawa strona: Przeciwnik -->
+        <div class="right-panel">
+            <h1>Przeciwnik</h1>
+            <div class="monster">
+                <img src="https://via.placeholder.com/150" alt="Potwór" id="monster-image">
+                <div class="life" id="monster-life">Życie: 100</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let balance = 0; // Domyślna moc
+        let monsterLife = 100; // Domyślne życie przeciwnika
+
+        const balanceElement = document.querySelector('.balance');
+        const expenseSection = document.getElementById('expense-section');
+        const initialBalanceForm = document.getElementById('initial-balance-form');
+        const expenseForm = document.getElementById('expense-form');
+        const expenseList = document.querySelector('.expense-list');
+        const monsterLifeElement = document.getElementById('monster-life');
+
+        // Funkcja aktualizująca Moc
+        function updateBalance(amount) {
+            balance -= amount;
+            balanceElement.textContent = `${balance}zł`;
+
+            // Sprawdzamy, czy moc gracza jest mniejsza niż życie przeciwnika
+            if (balance < monsterLife) {
+                alert("Przegrałeś! Twoja moc jest mniejsza niż życie przeciwnika.");
+                // Reset gry (opcjonalnie)
+                resetGame();
+            }
+        }
+
+        // Obsługa formularza ustawienia początkowej Mocy
+        initialBalanceForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const initialBalance = parseFloat(document.getElementById('initial-balance').value);
+
+            balance = initialBalance;
+            balanceElement.textContent = `${balance}zł`;
+
+            // Pokazanie sekcji zarządzania Mocą po ustawieniu początkowej wartości
+            expenseSection.style.display = 'block';
+
+            // Ukrycie formularza ustawienia początkowej Mocy
+            initialBalanceForm.style.display = 'none';
+        });
+
+        // Obsługa formularza wydatków
+        expenseForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const expenseAmount = parseFloat(document.getElementById('expense-amount').value);
+            const expenseDescription = document.getElementById('expense-description').value;
+
+            // Aktualizacja Mocy
+            updateBalance(expenseAmount);
+
+            // Dodanie wydatku do listy
+            const expenseItem = document.createElement('div');
+            expenseItem.classList.add('expense-item');
+            expenseItem.innerHTML = `<span>${expenseDescription}</span><span>-${expenseAmount}zł</span>`;
+            expenseList.appendChild(expenseItem);
+
+            // Czyszczenie pól formularza
+            expenseForm.reset();
+        });
+
+        // Funkcja resetująca grę (opcjonalna)
+        function resetGame() {
+            balance = 0;
+            balanceElement.textContent = `${balance}zł`;
+            expenseList.innerHTML = "";
+            initialBalanceForm.style.display = 'block';
+            expenseSection.style.display = 'none';
+            alert("Gra została zresetowana. Ustaw nową moc, aby zacząć ponownie.");
+        }
+    </script>
+
+</body>
+</html>
