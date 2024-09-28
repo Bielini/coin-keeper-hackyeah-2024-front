@@ -3,26 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gra z Mocą i Przeciwnikiem</title>
+    <title>Coin Keeper</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
             margin: 0;
+            height: 100vh; /* Ustawienie wysokości na 100vh */
             background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .container {
-            display: flex;
-            justify-content: space-between;
+            width: 90%;
+            max-width: 400px; /* Ograniczenie maksymalnej szerokości dla smartfona */
+            height: 100%; /* Ustawienie wysokości na 100% kontenera */
             background-color: white;
-            padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Ustawienie na początek, aby przeciwnik był na górze */
+            padding: 20px; /* Dodanie wypełnienia */
         }
 
         .left-panel, .right-panel {
@@ -42,13 +45,18 @@
         form {
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: center; /* Wyśrodkowanie formularzy */
+            justify-content: center; /* Wyśrodkowanie formularzy */
+            width: 100%; /* Ustawienie szerokości formularza */
         }
 
-        input, button {
+        input {
             padding: 10px;
-            margin: 5px;
+            margin: 10px 0; /* Odstęp pionowy między polami formularza */
             font-size: 1em;
+            width: 100%; /* Pola formularza rozciągnięte na całą szerokość */
+            border-radius: 20px; /* Zwiększona wartość promienia zaokrąglenia */
+            border: 1px solid #ccc; /* Dodanie ramki */
         }
 
         button {
@@ -56,7 +64,10 @@
             background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 20px; /* Zwiększona wartość promienia zaokrąglenia */
+            padding: 10px 20px; /* Dodanie dodatkowego wypełnienia */
+            font-size: 1em;
+            width: 100%; /* Przycisk rozciągnięty na całą szerokość */
         }
 
         button:hover {
@@ -66,6 +77,8 @@
         .expense-list {
             margin-top: 20px;
             max-width: 300px;
+            margin-left: auto; /* Wyśrodkowanie listy wydatków */
+            margin-right: auto; /* Wyśrodkowanie listy wydatków */
         }
 
         .expense-item {
@@ -84,7 +97,8 @@
         /* Styl dla przeciwnika */
         .monster {
             text-align: center;
-            margin-top: 20px;
+            margin-bottom: 20px; /* Dodanie odstępu poniżej */
+            display: none; /* Ukrycie sekcji przeciwnika na początku */
         }
 
         .monster img {
@@ -97,19 +111,62 @@
             color: red;
             margin-top: 10px;
         }
+
+        /* Ekran przegranej */
+        #game-over-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            z-index: 10;
+        }
+
+        #game-over-screen button {
+            background-color: red;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px; /* Zwiększona wartość promienia zaokrąglenia */
+            margin-top: 20px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        #game-over-screen button:hover {
+            background-color: darkred;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- Prawa strona: Przeciwnik -->
+        <div class="right-panel">
+            <div class="monster">
+                <h1>Przeciwnik</h1>
+                <img src="https://via.placeholder.com/150" alt="Potwór" id="monster-image">
+                <div class="life" id="monster-life">Życie: 100</div>
+            </div>
+        </div>
+
         <!-- Lewa strona: Moc i wydatki -->
         <div class="left-panel">
-            <h1>Moc</h1>
+            <h1>Coin Keeper</h1> <!-- Zmieniono tytuł na "Coin Keeper" -->
 
-            <!-- Formularz ustawienia początkowej mocy -->
+            <!-- Formularz ustawienia początkowej mocy i życia przeciwnika -->
             <form id="initial-balance-form">
-                <input type="number" id="initial-balance" placeholder="Ustaw początkową Moc" required>
-                <button type="submit">Ustaw Moc</button>
+                <input type="number" id="initial-balance" placeholder="Ustaw początkową Moc (Przychód)" required>
+                <input type="number" id="initial-monster-life" placeholder="Ustaw życie przeciwnika (Cel oszczędzania)" required>
+                <button type="submit">Ustaw cel</button>
             </form>
 
             <!-- Sekcja zarządzania wydatkami -->
@@ -123,15 +180,12 @@
                 <div class="expense-list"></div>
             </div>
         </div>
+    </div>
 
-        <!-- Prawa strona: Przeciwnik -->
-        <div class="right-panel">
-            <h1>Przeciwnik</h1>
-            <div class="monster">
-                <img src="https://via.placeholder.com/150" alt="Potwór" id="monster-image">
-                <div class="life" id="monster-life">Życie: 100</div>
-            </div>
-        </div>
+    <!-- Ekran przegranej -->
+    <div id="game-over-screen">
+        <div>Przegrałeś! Twoja moc jest mniejsza niż życie przeciwnika.</div>
+        <button id="restart-button">Zacznij ponownie</button>
     </div>
 
     <script>
@@ -144,6 +198,9 @@
         const expenseForm = document.getElementById('expense-form');
         const expenseList = document.querySelector('.expense-list');
         const monsterLifeElement = document.getElementById('monster-life');
+        const monsterSection = document.querySelector('.monster'); // Dodano odniesienie do sekcji przeciwnika
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const restartButton = document.getElementById('restart-button');
 
         // Funkcja aktualizująca Moc
         function updateBalance(amount) {
@@ -152,22 +209,27 @@
 
             // Sprawdzamy, czy moc gracza jest mniejsza niż życie przeciwnika
             if (balance < monsterLife) {
-                alert("Przegrałeś! Twoja moc jest mniejsza niż życie przeciwnika.");
-                // Reset gry (opcjonalnie)
-                resetGame();
+                showGameOverScreen();
             }
         }
 
-        // Obsługa formularza ustawienia początkowej Mocy
+        // Obsługa formularza ustawienia początkowej Mocy i życia przeciwnika
         initialBalanceForm.addEventListener('submit', function(event) {
             event.preventDefault();
             const initialBalance = parseFloat(document.getElementById('initial-balance').value);
+            const initialMonsterLife = parseFloat(document.getElementById('initial-monster-life').value);
 
             balance = initialBalance;
+            monsterLife = initialMonsterLife;
+
             balanceElement.textContent = `${balance}zł`;
+            monsterLifeElement.textContent = `Życie: ${monsterLife}`;
 
             // Pokazanie sekcji zarządzania Mocą po ustawieniu początkowej wartości
             expenseSection.style.display = 'block';
+
+            // Pokazanie sekcji przeciwnika po ustawieniu początkowej wartości
+            monsterSection.style.display = 'block';
 
             // Ukrycie formularza ustawienia początkowej Mocy
             initialBalanceForm.style.display = 'none';
@@ -179,27 +241,38 @@
             const expenseAmount = parseFloat(document.getElementById('expense-amount').value);
             const expenseDescription = document.getElementById('expense-description').value;
 
-            // Aktualizacja Mocy
+            // Dodanie wydatku do balansu
             updateBalance(expenseAmount);
 
             // Dodanie wydatku do listy
             const expenseItem = document.createElement('div');
-            expenseItem.classList.add('expense-item');
-            expenseItem.innerHTML = `<span>${expenseDescription}</span><span>-${expenseAmount}zł</span>`;
+            expenseItem.className = 'expense-item';
+            expenseItem.innerHTML = `<span>${expenseDescription}</span> - <span>${expenseAmount}zł</span>`;
             expenseList.appendChild(expenseItem);
 
             // Czyszczenie pól formularza
             expenseForm.reset();
         });
 
-        // Funkcja resetująca grę (opcjonalna)
+        // Funkcja pokazująca ekran przegranej
+        function showGameOverScreen() {
+            gameOverScreen.style.display = 'flex';
+        }
+
+        // Obsługa przycisku restartu gry
+        restartButton.addEventListener('click', function() {
+            resetGame();
+        });
+
+        // Funkcja resetująca grę
         function resetGame() {
             balance = 0;
             balanceElement.textContent = `${balance}zł`;
             expenseList.innerHTML = "";
             initialBalanceForm.style.display = 'block';
             expenseSection.style.display = 'none';
-            alert("Gra została zresetowana. Ustaw nową moc, aby zacząć ponownie.");
+            monsterSection.style.display = 'none'; // Ukrycie sekcji przeciwnika
+            gameOverScreen.style.display = 'none'; // Ukrycie ekranu przegranej
         }
     </script>
 
