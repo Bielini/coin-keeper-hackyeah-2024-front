@@ -25,7 +25,6 @@ const AnimalWave: React.FC = () => {
       ])
     ).start(); // Start the animation loop
   }, [animatedValue]);
-
   return (
     <View style={styles.container}>
       {/* Animated View that moves the lemur image */}
