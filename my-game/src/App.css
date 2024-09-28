@@ -1,21 +1,14 @@
-body {
-  font-family: Arial, sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  margin: 0;
-  background-color: #f0f0f0;
-}
-
 .container {
-  display: flex;
-  justify-content: space-between;
+  width: 90%;
+  max-width: 400px;
+  height: 100%;
   background-color: white;
-  padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 20px;
 }
 
 .left-panel, .right-panel {
@@ -36,20 +29,28 @@ form {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
-input, button {
+input {
   padding: 10px;
-  margin: 5px;
+  margin: 10px 0;
   font-size: 1em;
+  width: 100%;
+  border-radius: 20px;
+  border: 1px solid #ccc;
 }
 
 button {
   cursor: pointer;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 1em;
+  width: 100%;
 }
 
 button:hover {
@@ -70,23 +71,33 @@ button:hover {
   border: 1px solid #ddd;
 }
 
-#expense-section {
-  display: none; /* Ukrywamy sekcję zarządzania Mocą na początku */
+#game-over-screen {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 2em;
+  z-index: 10;
 }
 
-/* Styl dla przeciwnika */
-.monster {
-  text-align: center;
+#game-over-screen button {
+  background-color: red;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
   margin-top: 20px;
+  font-size: 1em;
+  cursor: pointer;
 }
 
-.monster img {
-  max-width: 150px;
-  height: auto;
-}
-
-.monster .life {
-  font-size: 1.5em;
-  color: red;
-  margin-top: 10px;
+#game-over-screen button:hover {
+  background-color: darkred;
 }
