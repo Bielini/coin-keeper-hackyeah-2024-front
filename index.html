@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin Keeper</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            height: 100vh;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            height: 100%;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 20px;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        .right-panel {
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .balance {
+            font-size: 2em;
+            margin: 20px 0;
+            width: 100%;
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 1em;
+            width: 100%;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .expense-list {
+            margin-top: 20px;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .expense-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px;
+            background-color: #f9f9f9;
+            margin-bottom: 5px;
+            border: 1px solid #ddd;
+        }
+
+        #expense-section {
+            display: none;
+        }
+
+        .monster {
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .monster img {
+            max-width: 150px;
+            height: auto;
+        }
+
+        .monster .life {
+            font-size: 1.5em;
+            color: red;
+            margin-top: 10px;
+        }
+
+        #game-over-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            z-index: 10;
+        }
+
+        #game-over-screen button {
+            background-color: red;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            margin-top: 20px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        #game-over-screen button:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Prawa strona: Przeciwnik -->
+    <div class="right-panel">
+        <div class="monster">
+            <h1>Przeciwni</h1>
+            <img src="przeciwnik.png" alt="Potwór" id="monster-image">
+            <div class="life" id="monster-life">Życie: 100</div>
+        </div>
+    </div>
+
+    <!-- Lewa strona: Moc i wydatki -->
+    <div class="left-panel">
+        <h1 id="title">Coin Keeper</h1>
+
+        <!-- Formularz ustawienia nazwy i początkowych wartości -->
+        <form id="initial-balance-form">
+            <input type="number" id="initial-balance" placeholder="Ustaw początkową Moc (Przychód)" required>
+            <input type="text" id="monster-name" placeholder="Nazwa przeciwnika (Cel oszczędzania)" required>
+            <input type="number" id="initial-monster-life" placeholder="Ustaw życie przeciwnika (Wartość celu oszczędzania)"
+                   required>
+            <button type="submit">Ustaw cel</button>
+        </form>
+
+        <!-- Sekcja zarządzania wydatkami -->
+        <div id="expense-section">
+            <div class="balance">0zł</div>
+            <form id="expense-form">
+                <input type="number" id="expense-amount" placeholder="Wartość wydatku" required>
+                <input type="text" id="expense-description" placeholder="Opis wydatku" required>
+                <button type="submit">Dodaj wydatek</button>
+            </form>
+            <div class="expense-list"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Ekran przegranej -->
+<div id="game-over-screen">
+    <div>Przegrałeś! Twoja moc jest mniejsza niż życie przeciwnika.</div>
+    <button id="restart-button">Zacznij ponownie</button>
+</div>
+
+<script>
+    let balance = 0; // Domyślna moc
+    let monsterLife = 100; // Domyślne życie przeciwnika
+
+    const balanceElement = document.querySelector('.balance');
+    const expenseSection = document.getElementById('expense-section');
+    const initialBalanceForm = document.getElementById('initial-balance-form');
+    const expenseForm = document.getElementById('expense-form');
+    const expenseList = document.querySelector('.expense-list');
+    const monsterLifeElement = document.getElementById('monster-life');
+    const monsterSection = document.querySelector('.monster');
+    const monsterImageElement = document.getElementById('monster-image');
+    const gameOverScreen = document.getElementById('game-over-screen');
+    const restartButton = document.getElementById('restart-button');
+    const titleElement = document.getElementById('title');
+
+    // Funkcja aktualizująca Moc
+    function updateBalance(amount) {
+        balance -= amount;
+        balanceElement.textContent = `${balance}zł`;
+
+        // Sprawdzamy, czy moc gracza jest mniejsza niż życie przeciwnika
+        if (balance < monsterLife) {
+            showGameOverScreen();
+        }
+    }
+
+    // Obsługa formularza ustawienia początkowej Mocy i życia przeciwnika
+    initialBalanceForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const monsterName = document.getElementById('monster-name').value;
+        const initialBalance = parseFloat(document.getElementById('initial-balance').value);
+        monsterLife = parseFloat(document.getElementById('initial-monster-life').value);
+
+        // Ustawienie początkowych wartości
+        balance = initialBalance;
+        balanceElement.textContent = `${balance}zł`;
+        monsterLifeElement.textContent = `Życie: ${monsterLife}`;
+
+        // Pokazanie sekcji zarządzania Mocą i przeciwnikiem po ustawieniu początkowych wartości
+        expenseSection.style.display = 'block';
+        monsterSection.style.display = 'block';
+
+        // Zmiana tytułu na "Moc"
+        titleElement.textContent = "Moc";
+
+        // Ukrycie formularza początkowego
+        initialBalanceForm.style.display = 'none';
+
+        // Pobranie obrazka przeciwnika z serwera
+        fetchMonsterImage(monsterName);
+    });
+
+// Pobieranie obrazka przeciwnika
+async function fetchMonsterImage(monsterName) {
+const body = `${monsterName} monster`;
+
+try {
+    // Oczekiwanie na odpowiedź z serwera
+    const response = await fetch('http://localhost:8080/image', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'text/plain'
+        },
+        body: body,
+    mode: 'no-cors'
+    });
+
+    if (!response.ok) {
+        throw new Error('Błąd pobierania obrazka: ' + response.statusText);
+    }
+
+    // Oczekiwanie na odpowiedź w postaci tekstowej (zakładamy, że jest to base64)
+    const base64Image = await response.text();
+
+    // Ustawienie pobranego obrazka jako źródło elementu img
+    monsterImageElement.src = `data:image/png;base64,${base64Image}`;
+} catch (error) {
+    console.error('Błąd pobierania obrazka:', error);
+}
+}
+
+    // Obsługa formularza wydatków
+    expenseForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const expenseAmount = parseFloat(document.getElementById('expense-amount').value);
+        const expenseDescription = document.getElementById('expense-description').value;
+
+        // Dodanie wydatku do balansu
+        updateBalance(expenseAmount);
+
+        // Dodanie wydatku do listy
+        const expenseItem = document.createElement('div');
+        expenseItem.className = 'expense-item';
+        expenseItem.innerHTML = `<span>${expenseDescription}</span> - <span>${expenseAmount}zł</span>`;
+        expenseList.appendChild(expenseItem);
+
+        // Czyszczenie pól formularza
+        expenseForm.reset();
+    });
+
+    // Funkcja pokazująca ekran przegranej
+    function showGameOverScreen() {
+        gameOverScreen.style.display = 'flex';
+    }
+
+    // Obsługa przycisku restartu gry
+    restartButton.addEventListener('click', function() {
+        resetGame();
+    });
+
+    // Funkcja resetująca grę
+    function resetGame() {
+        balance = 0;
+        balanceElement.textContent = `${balance}zł`;
+        expenseList.innerHTML = "";
+        initialBalanceForm.style.display = 'block';
+        expenseSection.style.display = 'none';
+        monsterSection.style.display = 'none';
+        gameOverScreen.style.display = 'none';
+        titleElement.textContent = "Coin Keeper";
+    }
+</script>
+
+</body>
+</html>
